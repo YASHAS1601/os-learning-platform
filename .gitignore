@@ -1,0 +1,37 @@
+# Miscellaneous & Logs
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.history
+
+# IDE & Editor Configs
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+coverage/
+**/doc/api/
+**/ios/Flutter/.last_build_id
+
+# Node.js
+node_modules/
+backend/node_modules/
+
+# Environment Variables & Secrets
+.env
+.env.*
+*.env
+!.env.example
+!backend/.env.example
+backend/.env
+backend/.env.*
