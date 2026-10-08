@@ -77,10 +77,10 @@ class AITutorService implements AITutorServiceInterface {
       return [customBaseUrl!];
     }
     return [
-      defaultBaseUrl,            // LAN IP http://10.241.58.252:3000 (preferred for local development)
-      if (productionBaseUrl.isNotEmpty) productionBaseUrl, // Render production URL fallback
-      'http://localhost:3000',    // ADB reverse / local host
-      'http://10.0.2.2:3000',     // Android emulator
+      if (productionBaseUrl.isNotEmpty) productionBaseUrl, // Render production URL preferred
+      defaultBaseUrl,            // LAN IP http://10.241.58.252:3000 fallback
+      'http://localhost:3000',    // ADB reverse / local host fallback
+      'http://10.0.2.2:3000',     // Android emulator fallback
     ];
   }
 
