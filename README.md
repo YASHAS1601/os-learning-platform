@@ -30,7 +30,6 @@ os_learning_platform/
 │   ├── package.json            # Node.js dependencies
 │   ├── package-lock.json       # Dependency lock file
 │   ├── render.yaml             # Render infrastructure configuration
-│   └── .env.example            # Environment variable placeholders
 │
 ├── supabase/                   # Database schema & RLS policies
 │   └── schema.sql              # Supabase SQL setup script
