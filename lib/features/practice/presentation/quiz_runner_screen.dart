@@ -8,6 +8,7 @@ import 'quiz_result_screen.dart';
 import '../../ai_tutor/models/tutor_context_model.dart';
 import '../../ai_tutor/models/tutor_mode.dart';
 import '../../ai_tutor/presentation/ai_tutor_screen.dart';
+import '../../profile/repositories/personalized_learning_repository.dart';
 
 
 import '../models/question_model.dart';
@@ -42,6 +43,21 @@ class _QuizRunnerScreenState extends State<QuizRunnerScreen> {
       _selectedAnswers[_currentIndex] = optionIndex;
       _showExplanation = true;
     });
+
+    final q = _questions[_currentIndex];
+    if (optionIndex != q.correctOptionIndex) {
+      PersonalizedLearningRepository.instance.recordWrongQuestion(
+        questionId: q.id,
+        topicId: q.topicId,
+        topicName: q.topicName,
+        categoryId: q.categoryId,
+        questionText: q.questionText,
+        options: q.options,
+        correctOptionIndex: q.correctOptionIndex,
+        userSelectedOptionIndex: optionIndex,
+        explanation: q.explanation,
+      );
+    }
   }
 
   void _nextQuestion() {
@@ -80,6 +96,28 @@ class _QuizRunnerScreenState extends State<QuizRunnerScreen> {
         score: score,
         totalQuestions: _questions.length,
       );
+    } catch (_) {}
+
+    // Record any wrong questions for Personalized Learning in Student Profile
+    try {
+      final pRepo = PersonalizedLearningRepository.instance;
+      for (int i = 0; i < _questions.length; i++) {
+        final q = _questions[i];
+        final userAnswer = _selectedAnswers[i] ?? -1;
+        if (userAnswer != q.correctOptionIndex) {
+          await pRepo.recordWrongQuestion(
+            questionId: q.id,
+            topicId: q.topicId,
+            topicName: q.topicName,
+            categoryId: q.categoryId,
+            questionText: q.questionText,
+            options: q.options,
+            correctOptionIndex: q.correctOptionIndex,
+            userSelectedOptionIndex: userAnswer,
+            explanation: q.explanation,
+          );
+        }
+      }
     } catch (_) {}
 
     if (!mounted) return;

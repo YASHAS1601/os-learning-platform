@@ -3,6 +3,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/glass_container.dart';
 import '../../../core/widgets/neon_button.dart';
 import '../models/quiz_model.dart';
+import '../../profile/repositories/personalized_learning_repository.dart';
+import '../../profile/presentation/personalized_quiz_screen.dart';
 
 class QuizResultScreen extends StatelessWidget {
   final QuizModel quiz;
@@ -137,6 +139,31 @@ class QuizResultScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 30),
+
+                  if (total - score > 0) ...[
+                    NeonButton(
+                      text: "Personalized Mistake Quiz (${total - score} Missed)",
+                      icon: Icons.psychology_alt_rounded,
+                      glowColor: isDark ? AppColors.neonPurple : AppColors.iconActiveLight,
+                      onPressed: () async {
+                        final pRepo = PersonalizedLearningRepository.instance;
+                        final pending = await pRepo.getPendingQuestions();
+                        if (!context.mounted) return;
+                        if (pending.isNotEmpty) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PersonalizedQuizScreen(
+                                title: "${quiz.title} Review",
+                                questions: pending,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                  ],
 
                   // Retry and Back Buttons
                   NeonButton(

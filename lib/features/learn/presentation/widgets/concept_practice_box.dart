@@ -3,6 +3,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/glass_container.dart';
 import '../../../practice/utils/quiz_validator.dart';
 import '../../models/topic_model.dart';
+import '../../../profile/repositories/personalized_learning_repository.dart';
+import '../../../profile/services/os_mnemonic_service.dart';
 
 class ConceptPracticeBox extends StatefulWidget {
   final List<ConceptQuestionModel> questions;
@@ -40,6 +42,21 @@ class _ConceptPracticeBoxState extends State<ConceptPracticeBox> {
     setState(() {
       _hasSubmitted = true;
     });
+
+    final question = _questions[_currentQuestionIndex];
+    if (_selectedOptionIndex != question.correctOptionIndex) {
+      PersonalizedLearningRepository.instance.recordWrongQuestion(
+        questionId: question.id,
+        topicId: 'concept_practice',
+        topicName: 'OS Concept Practice',
+        categoryId: 'cat_basics',
+        questionText: question.question,
+        options: question.options,
+        correctOptionIndex: question.correctOptionIndex,
+        userSelectedOptionIndex: _selectedOptionIndex!,
+        explanation: question.explanation,
+      );
+    }
   }
 
   void _nextQuestion() {
@@ -233,6 +250,31 @@ class _ConceptPracticeBoxState extends State<ConceptPracticeBox> {
                     question.explanation,
                     style: TextStyle(fontSize: 12, color: AppColors.text1(context), height: 1.4),
                   ),
+                  if (!isCorrect) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: (isDark ? AppColors.neonPurple : Colors.purple).withAlpha(30),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: (isDark ? AppColors.neonPurple : Colors.purple).withAlpha(120)),
+                      ),
+                      child: Text(
+                        OsMnemonicService.getMnemonic(
+                          topicId: 'concept_practice',
+                          topicName: 'OS Concept',
+                          questionText: question.question,
+                          explanation: question.explanation,
+                        ),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.purple.shade200 : Colors.purple.shade900,
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

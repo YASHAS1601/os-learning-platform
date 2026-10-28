@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:markdown/markdown.dart' as md;
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/glass_container.dart';
 import '../models/chat_message.dart';
@@ -408,98 +409,113 @@ class _RiyahChatBubble extends StatelessWidget {
                             height: 1.45,
                           ),
                         )
-                      : MarkdownBody(
-                          data: message.text,
-                          selectable: true,
-                          extensionSet: md.ExtensionSet(
-                            md.ExtensionSet.gitHubFlavored.blockSyntaxes,
-                            [
-                              BlockMathSyntax(),
-                              InlineMathSyntax(),
-                              ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes,
-                            ],
-                          ),
-                          builders: {
-                            'latex-inline': LatexElementBuilder(style: TextStyle(color: textColor, fontSize: 13.5)),
-                            'latex-block': LatexElementBuilder(style: TextStyle(color: bubbleColor, fontSize: 14.5)),
-                          },
-                          styleSheet: MarkdownStyleSheet(
-                            p: TextStyle(
-                              color: textColor,
-                              fontSize: 13.5,
-                              height: 1.5,
-                            ),
-                            h1: TextStyle(
-                              color: bubbleColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              height: 1.4,
-                            ),
-                            h2: TextStyle(
-                              color: bubbleColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              height: 1.4,
-                            ),
-                            h3: TextStyle(
-                              color: bubbleColor,
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w600,
-                              height: 1.35,
-                            ),
-                            strong: TextStyle(
-                              color: isDark ? Colors.white : AppColors.textPrimaryLight,
-                              fontWeight: FontWeight.bold,
-                            ),
-
-                            em: const TextStyle(
-                              fontStyle: FontStyle.italic,
-                            ),
-                            code: TextStyle(
-                              color: isDark ? AppColors.neonCyan : AppColors.lightBlue,
-                              backgroundColor: inlineCodeBgColor,
-                              fontFamily: 'monospace',
-                              fontSize: 12.5,
-                            ),
-                            codeblockPadding: const EdgeInsets.all(12),
-                            codeblockDecoration: BoxDecoration(
-                              color: codeBgColor,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: bubbleColor.withAlpha(60),
-                                width: 1,
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            MarkdownBody(
+                              data: message.text,
+                              selectable: true,
+                              onTapLink: (text, href, title) async {
+                                if (href != null && href.isNotEmpty) {
+                                  final uri = Uri.tryParse(href);
+                                  if (uri != null) {
+                                    try {
+                                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                    } catch (_) {}
+                                  }
+                                }
+                              },
+                              extensionSet: md.ExtensionSet(
+                                md.ExtensionSet.gitHubFlavored.blockSyntaxes,
+                                [
+                                  BlockMathSyntax(),
+                                  InlineMathSyntax(),
+                                  ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes,
+                                ],
                               ),
-                            ),
-                            blockquote: TextStyle(
-                              color: AppColors.textM(context),
-                              fontStyle: FontStyle.italic,
-                              fontSize: 13,
-                            ),
-                            blockquotePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            blockquoteDecoration: BoxDecoration(
-                              color: bubbleColor.withAlpha(15),
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border(
-                                left: BorderSide(
+                              builders: {
+                                'latex-inline': LatexElementBuilder(style: TextStyle(color: textColor, fontSize: 13.5)),
+                                'latex-block': LatexElementBuilder(style: TextStyle(color: bubbleColor, fontSize: 14.5)),
+                              },
+                              styleSheet: MarkdownStyleSheet(
+                                p: TextStyle(
+                                  color: textColor,
+                                  fontSize: 13.5,
+                                  height: 1.5,
+                                ),
+                                h1: TextStyle(
                                   color: bubbleColor,
-                                  width: 3,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.4,
+                                ),
+                                h2: TextStyle(
+                                  color: bubbleColor,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.4,
+                                ),
+                                h3: TextStyle(
+                                  color: bubbleColor,
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.35,
+                                ),
+                                strong: TextStyle(
+                                  color: isDark ? Colors.white : AppColors.textPrimaryLight,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                em: const TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                code: TextStyle(
+                                  color: isDark ? AppColors.neonCyan : AppColors.lightBlue,
+                                  backgroundColor: inlineCodeBgColor,
+                                  fontFamily: 'monospace',
+                                  fontSize: 12.5,
+                                ),
+                                codeblockPadding: const EdgeInsets.all(12),
+                                codeblockDecoration: BoxDecoration(
+                                  color: codeBgColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: bubbleColor.withAlpha(60),
+                                    width: 1,
+                                  ),
+                                ),
+                                blockquote: TextStyle(
+                                  color: AppColors.textM(context),
+                                  fontStyle: FontStyle.italic,
+                                  fontSize: 13,
+                                ),
+                                blockquotePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                blockquoteDecoration: BoxDecoration(
+                                  color: bubbleColor.withAlpha(15),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border(
+                                    left: BorderSide(
+                                      color: bubbleColor,
+                                      width: 3,
+                                    ),
+                                  ),
+                                ),
+                                listBullet: TextStyle(
+                                  color: bubbleColor,
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                horizontalRuleDecoration: BoxDecoration(
+                                  border: Border(
+                                    top: BorderSide(
+                                      color: bubbleColor.withAlpha(50),
+                                      width: 1,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                            listBullet: TextStyle(
-                              color: bubbleColor,
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            horizontalRuleDecoration: BoxDecoration(
-                              border: Border(
-                                top: BorderSide(
-                                  color: bubbleColor.withAlpha(50),
-                                  width: 1,
-                                ),
-                              ),
-                            ),
-                          ),
+                            _buildQuickLinkChips(context, message.text, isDark),
+                          ],
                         ),
                 ],
               ),
@@ -518,6 +534,120 @@ class _RiyahChatBubble extends StatelessWidget {
               child: Icon(Icons.person_rounded, color: bubbleColor, size: 18),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickLinkChips(BuildContext context, String text, bool isDark) {
+    final linkRegex = RegExp(r'\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)');
+    final matches = linkRegex.allMatches(text);
+    if (matches.isEmpty) return const SizedBox.shrink();
+
+    final List<Widget> chips = [];
+    for (final match in matches) {
+      final rawLabel = match.group(1) ?? 'Resource';
+      final url = match.group(2) ?? '';
+      final isYouTube = url.contains('youtube.com') ||
+          url.contains('youtu.be') ||
+          rawLabel.toLowerCase().contains('youtube');
+
+      final displayLabel = rawLabel
+          .replaceAll('▶ ', '')
+          .replaceAll('🌐 ', '')
+          .replaceAll('YouTube: ', '')
+          .replaceAll('Chrome/Web: ', '')
+          .replaceAll('Web: ', '')
+          .trim();
+
+      chips.add(
+        InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () async {
+            final uri = Uri.tryParse(url);
+            if (uri != null) {
+              try {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              } catch (_) {}
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: isYouTube
+                  ? Colors.red.withAlpha(isDark ? 40 : 25)
+                  : (isDark ? AppColors.neonCyan.withAlpha(35) : const Color(0xFFE0F2FE)),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isYouTube
+                    ? Colors.redAccent.withAlpha(isDark ? 160 : 120)
+                    : (isDark ? AppColors.neonCyan.withAlpha(160) : const Color(0xFF38BDF8)),
+                width: 1.1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isYouTube ? Icons.play_circle_fill_rounded : Icons.open_in_browser_rounded,
+                  size: 15,
+                  color: isYouTube
+                      ? (isDark ? Colors.redAccent : Colors.red.shade700)
+                      : (isDark ? AppColors.neonCyan : const Color(0xFF0284C7)),
+                ),
+                const SizedBox(width: 6),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 240),
+                  child: Text(
+                    isYouTube ? "YouTube: $displayLabel" : "Web: $displayLabel",
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: isYouTube
+                          ? (isDark ? Colors.red.shade200 : Colors.red.shade900)
+                          : (isDark ? AppColors.neonCyan : const Color(0xFF0369A1)),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.link_rounded,
+                size: 13,
+                color: isDark ? AppColors.neonCyan : AppColors.iconActiveLight,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                "Recommended External Links",
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.3,
+                  color: isDark ? AppColors.neonCyan : AppColors.iconActiveLight,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: chips,
+          ),
         ],
       ),
     );

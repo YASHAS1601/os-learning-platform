@@ -37,46 +37,112 @@ function getGeminiClient() {
 const apiKeyPresent = !!(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim() !== '' && process.env.GEMINI_API_KEY !== 'your_key_here');
 console.log(`GEMINI_API_KEY loaded: ${apiKeyPresent}`);
 
+// Curated YouTube & Web Resources (Gate Smashers OS Channel & Core Reference Videos)
+const GATE_SMASHERS_YT_RESOURCES = {
+  cpu: {
+    title: 'Gate Smashers: CPU Scheduling in Operating System',
+    url: 'https://www.youtube.com/results?search_query=Gate+Smashers+CPU+Scheduling+Operating+System'
+  },
+  file: {
+    title: 'Gate Smashers: File System Allocation Methods & Inode',
+    url: 'https://www.youtube.com/results?search_query=Gate+Smashers+File+System+Allocation+Methods+Inode'
+  },
+  disk: {
+    title: 'Gate Smashers: Disk Scheduling Algorithms in OS',
+    url: 'https://www.youtube.com/results?search_query=Gate+Smashers+Disk+Scheduling+Algorithms+Operating+System'
+  },
+  lecture1: {
+    title: 'Gate Smashers: Operating System Core Course',
+    url: 'https://www.youtube.com/watch?v=DKb7KhfoZmU'
+  },
+  lecture2: {
+    title: 'Gate Smashers: Process Management & Architecture',
+    url: 'https://www.youtube.com/watch?v=RozoeWzT7IM'
+  },
+  lecture3: {
+    title: 'Gate Smashers: Memory Management & Paging',
+    url: 'https://www.youtube.com/watch?v=lmlLdGMrdGU'
+  }
+};
+
+function getCuratedResourceLinks(topicText) {
+  const lower = (topicText || '').toLowerCase();
+  if (lower.includes('cpu') || lower.includes('schedul') || lower.includes('rr') || lower.includes('sjf') || lower.includes('fcfs')) {
+    return {
+      primaryYt: GATE_SMASHERS_YT_RESOURCES.cpu,
+      coreLectureYt: GATE_SMASHERS_YT_RESOURCES.lecture1,
+      web: { title: 'GeeksforGeeks: CPU Scheduling in OS', url: 'https://www.geeksforgeeks.org/cpu-scheduling-in-operating-systems/' }
+    };
+  }
+  if (lower.includes('file') || lower.includes('inode') || lower.includes('directory')) {
+    return {
+      primaryYt: GATE_SMASHERS_YT_RESOURCES.file,
+      coreLectureYt: GATE_SMASHERS_YT_RESOURCES.lecture2,
+      web: { title: 'GeeksforGeeks: File Systems in OS', url: 'https://www.geeksforgeeks.org/file-systems-in-operating-system/' }
+    };
+  }
+  if (lower.includes('disk') || lower.includes('scan') || lower.includes('sstf') || lower.includes('c-scan')) {
+    return {
+      primaryYt: GATE_SMASHERS_YT_RESOURCES.disk,
+      coreLectureYt: GATE_SMASHERS_YT_RESOURCES.lecture1,
+      web: { title: 'GeeksforGeeks: Disk Scheduling Algorithms', url: 'https://www.geeksforgeeks.org/disk-scheduling-algorithms/' }
+    };
+  }
+  if (lower.includes('memory') || lower.includes('pag') || lower.includes('segment') || lower.includes('virtual') || lower.includes('tlb')) {
+    return {
+      primaryYt: GATE_SMASHERS_YT_RESOURCES.lecture3,
+      coreLectureYt: GATE_SMASHERS_YT_RESOURCES.lecture1,
+      web: { title: 'GeeksforGeeks: Memory Management in OS', url: 'https://www.geeksforgeeks.org/memory-management-in-operating-system/' }
+    };
+  }
+  if (lower.includes('deadlock') || lower.includes('banker') || lower.includes('sync') || lower.includes('semaphore') || lower.includes('mutex')) {
+    return {
+      primaryYt: GATE_SMASHERS_YT_RESOURCES.lecture2,
+      coreLectureYt: GATE_SMASHERS_YT_RESOURCES.lecture1,
+      web: { title: 'GeeksforGeeks: Deadlock & Synchronization in OS', url: 'https://www.geeksforgeeks.org/introduction-of-deadlock-in-operating-system/' }
+    };
+  }
+
+  // Default core OS lectures
+  return {
+    primaryYt: GATE_SMASHERS_YT_RESOURCES.lecture1,
+    coreLectureYt: GATE_SMASHERS_YT_RESOURCES.lecture2,
+    web: { title: 'GeeksforGeeks: Operating Systems Tutorial', url: 'https://www.geeksforgeeks.org/operating-systems/' }
+  };
+}
+
+function ensureResourceLinks(replyText, contextOrPrompt) {
+  // If reply already contains these Gate Smashers video links, return as is
+  if (replyText.includes('DKb7KhfoZmU') && replyText.includes('RozoeWzT7IM') && replyText.includes('lmlLdGMrdGU')) {
+    return replyText;
+  }
+
+  const res = getCuratedResourceLinks(contextOrPrompt);
+  const resourceBlock = `\n\n---\n### 📺 Gate Smashers OS Reference Links\n- [▶ YouTube: ${res.primaryYt.title}](${res.primaryYt.url})\n- [▶ YouTube: Gate Smashers - OS Complete Course](https://www.youtube.com/watch?v=DKb7KhfoZmU)\n- [▶ YouTube: Gate Smashers - Process & Synchronization](https://www.youtube.com/watch?v=RozoeWzT7IM)\n- [▶ YouTube: Gate Smashers - Memory Management & Paging](https://www.youtube.com/watch?v=lmlLdGMrdGU)\n- [▶ YouTube: Gate Smashers - CPU Scheduling Algorithms](https://www.youtube.com/results?search_query=Gate+Smashers+CPU+Scheduling+Operating+System)\n- [▶ YouTube: Gate Smashers - Disk Scheduling Algorithms](https://www.youtube.com/results?search_query=Gate+Smashers+Disk+Scheduling+Algorithms+Operating+System)\n- [▶ YouTube: Gate Smashers - File System & Inode](https://www.youtube.com/results?search_query=Gate+Smashers+File+System+Allocation+Methods+Inode)\n- [🌐 Chrome/Web: ${res.web.title}](${res.web.url})`;
+  return replyText + resourceBlock;
+}
+
 // User System Instruction for Riyah OS AI Tutor
-const SYSTEM_INSTRUCTION = `You are Riyah, an AI Operating Systems tutor inside an educational learning platform.
+const SYSTEM_INSTRUCTION = `You are Riyah, a friendly, brilliant senior Operating Systems engineer and peer mentor inside an OS educational app.
 
-Your purpose is to teach students rather than simply give answers.
+CORE TEACHING RULES:
+1. NO ROBOTIC AI FLUFF: Never say "Hello! As an AI tutor", "Certainly, I'd be happy to explain", or similar generic AI introductions. Dive straight into the explanation.
+2. EXTREMELY CONCISE & TOKEN-EFFICIENT: Keep your initial answer focused, crisp, and under 250 words so responses generate instantly and use minimal tokens.
+3. CONCRETE REAL-WORLD EXAMPLES: Always anchor theoretical concepts with 1-2 vivid, practical analogies (e.g. restaurant chef for CPU scheduler, traffic signal for synchronization, library books for paging, train tracks for deadlock, phone apps backgrounding for context switching).
+4. NATURAL HUMAN TONE: Explain concepts intuitively like an experienced developer chatting over coffee, not an encyclopedia or formal textbook.
+5. INVITE DEEPER QUESTIONS: Always end your answer with a single brief, natural follow-up prompt inviting the student to ask a deeper question (e.g., "Want to see the C syscall implementation, run a numerical example, or test an edge case?").
+6. RECOMMENDED YOUTUBE & WEB LINKS: At the end of conceptual answers or doubt clarifications, include curated educational links in this exact format:
+---
+### 📺 Recommended Resources
+- [▶ YouTube: Topic Name](https://www.youtube.com/results?search_query=gate+smashers+topic+name)
+- [🌐 Chrome/Web: Topic Reference](https://www.geeksforgeeks.org/relevant-topic/)
 
-Use beginner-friendly language and explain concepts clearly.
-
-For conceptual questions:
-- explain the concept simply
-- use examples when useful
-- explain important terminology
-
-For numerical/problem-solving questions:
-- identify the given values
-- explain the relevant OS concept
-- solve step-by-step
-- show the final answer clearly
-
-For Solve With Me mode:
-- guide the student step-by-step
-- give hints
-- do not immediately reveal the complete answer unless requested
-
-For Code Tutor:
-- explain C, C++, Java or related code
-- explain important lines and logic
-- help the student understand rather than blindly copy code
-
-For Generate Practice:
-- generate questions related to the requested OS topic
-- vary difficulty
-- provide answers/explanations when requested
-
-For Quiz Me:
-- ask one question at a time
-- wait for the student's answer
-- evaluate it
-- explain mistakes
-
-Stay focused on Operating Systems and related programming concepts.`;
+MODE-SPECIFIC GUIDELINES:
+- Ask Tutor: Answer the student's question directly with concise logic + real-world example + follow-up prompt.
+- Explain Simply: Break it down for a beginner using everyday relatable metaphors.
+- Solve With Me: Give one step and a guiding hint at a time; don't dump the whole solution.
+- Code Tutor: Highlight the critical 3-4 lines of C/C++ OS code and explain the exact kernel behavior.
+- Quiz Me: Ask one sharp MCQ or conceptual question, wait for their answer.`;
 
 const PRIMARY_MODEL = 'gemini-3.6-flash';
 const FALLBACK_MODELS = [
@@ -161,6 +227,7 @@ async function generateRiyahResponseWithRetry(ai, userPrompt, mode, context) {
         config: {
           systemInstruction: SYSTEM_INSTRUCTION,
           temperature: 0.7,
+          maxOutputTokens: 600,
         }
       });
 
@@ -200,6 +267,7 @@ async function generateRiyahResponseWithRetry(ai, userPrompt, mode, context) {
         config: {
           systemInstruction: SYSTEM_INSTRUCTION,
           temperature: 0.7,
+          maxOutputTokens: 600,
         }
       });
 
@@ -298,10 +366,12 @@ const handleRiyahChatPost = async (req, res) => {
       setTimeout(() => reject(new Error("GATEWAY_TIMEOUT")), 40000)
     );
 
-    const { text: replyText, modelUsed, fallbackTriggered } = await Promise.race([
+    const { text: rawReplyText, modelUsed, fallbackTriggered } = await Promise.race([
       generateRiyahResponseWithRetry(ai, userPrompt, selectedMode, contextData),
       timeoutPromise
     ]);
+
+    const replyText = ensureResourceLinks(rawReplyText, `${userPrompt} ${topic || ''} ${subtopic || ''} ${question || ''}`);
 
     const totalDuration = Date.now() - reqStartTime;
     console.log(`[RIYAH] Request succeeded in ${totalDuration}ms | Model used: ${modelUsed} | Fallback triggered: ${fallbackTriggered}`);
