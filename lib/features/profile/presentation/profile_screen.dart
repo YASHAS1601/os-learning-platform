@@ -218,6 +218,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               fontWeight: FontWeight.bold,
                               color: AppColors.text1(context),
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 2),
                           Text(
@@ -226,6 +228,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               fontSize: 12,
                               color: AppColors.text2(context),
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 8),
                           Container(
@@ -391,14 +395,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Overall OS Mastery",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.text1(context),
+                          Expanded(
+                            child: Text(
+                              "Overall OS Mastery",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.text1(context),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                          const SizedBox(width: 8),
                           Text(
                             "${(_completedTopics / 64 * 100).toInt()}%",
                             style: TextStyle(
@@ -438,7 +447,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   crossAxisCount: 2,
-                  childAspectRatio: 1.8,
+                  childAspectRatio: 1.4,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                   children: [
@@ -497,6 +506,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.text1(context),
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 2),
                             Text(
@@ -507,19 +518,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 fontSize: 11.5,
                                 color: AppColors.text2(context),
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(width: 8),
                       ElevatedButton(
                         onPressed: () => setState(() => _selectedTabIndex = 1),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: accentPurple,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        child: const Text("View Tab", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                        child: const Text("View", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -615,8 +629,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const SizedBox(height: 14),
                         NeonButton(
                           text: _pendingWrongQuestions.isNotEmpty
-                              ? "Launch Personalized Quiz (${_pendingWrongQuestions.length} Pending)"
-                              : "Review All Questions (${_allWrongQuestions.length})",
+                              ? "Launch Quiz (${_pendingWrongQuestions.length} Pending)"
+                              : "Review Questions (${_allWrongQuestions.length})",
                           icon: Icons.play_arrow_rounded,
                           glowColor: accentPurple,
                           onPressed: () {
@@ -713,10 +727,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "Showing ${_displayedQuestions.length} marked questions",
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textM(context)),
+                      Expanded(
+                        child: Text(
+                          "Showing ${_displayedQuestions.length} marked questions",
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textM(context)),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       Row(
                         children: [
                           Text(
@@ -937,6 +956,7 @@ class _WrongQuestionCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
@@ -1181,7 +1201,7 @@ class _StatTile extends StatelessWidget {
     final isDark = AppColors.isDark(context);
 
     return GlassContainer(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       borderColor: color.withAlpha(isDark ? 40 : 30),
       child: FittedBox(
         fit: BoxFit.scaleDown,

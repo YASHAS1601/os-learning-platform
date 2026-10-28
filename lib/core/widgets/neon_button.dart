@@ -39,13 +39,19 @@ class NeonButton extends StatelessWidget {
           Icon(icon, color: isDark ? const Color(0xFF07111F) : Colors.white, size: 20),
           const SizedBox(width: 8),
         ],
-        Text(
-          text,
-          style: TextStyle(
-            color: isDark ? const Color(0xFF07111F) : Colors.white,
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.3,
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              text,
+              style: TextStyle(
+                color: isDark ? const Color(0xFF07111F) : Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.3,
+              ),
+              maxLines: 1,
+            ),
           ),
         ),
       ],
