@@ -267,6 +267,9 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
                 ),
               ),
 
+            // Curated Gate Smashers YouTube Reference Dock attached above the chat input box
+            _buildChatBoxReferenceDock(context, isDark),
+
             // Text Input Bar at bottom
             Padding(
               padding: const EdgeInsets.only(left: 16, right: 16, bottom: 20, top: 4),
@@ -321,6 +324,81 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
       ),
     );
   }
+
+  Widget _buildChatBoxReferenceDock(BuildContext context, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.video_library_rounded, size: 12, color: isDark ? AppColors.neonCyan : AppColors.iconActiveLight),
+              const SizedBox(width: 4),
+              Text(
+                "Gate Smashers Reference Channels & Topics:",
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.2,
+                  color: isDark ? AppColors.neonCyan : AppColors.iconActiveLight,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: AITutorService.gateSmashersYtResources.map((res) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () async {
+                      final uri = Uri.tryParse(res['url'] ?? '');
+                      if (uri != null) {
+                        try {
+                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        } catch (_) {}
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withAlpha(isDark ? 35 : 20),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.redAccent.withAlpha(isDark ? 140 : 100),
+                          width: 0.9,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.play_circle_fill_rounded, size: 12, color: Colors.redAccent),
+                          const SizedBox(width: 4),
+                          Text(
+                            res['tag'] ?? 'Video',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.red.shade200 : Colors.red.shade900,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _RiyahChatBubble extends StatelessWidget {
@@ -339,6 +417,13 @@ class _RiyahChatBubble extends StatelessWidget {
     final textColor = AppColors.text1(context);
     final codeBgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9);
     final inlineCodeBgColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0);
+
+    final String displayText = !isUser
+        ? AITutorService.appendGateSmashersReferences(
+            message.text,
+            promptOrTopic: '${message.context?.topicTitle ?? ""} ${message.context?.questionText ?? ""}',
+          )
+        : message.text;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -413,7 +498,7 @@ class _RiyahChatBubble extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             MarkdownBody(
-                              data: message.text,
+                              data: displayText,
                               selectable: true,
                               onTapLink: (text, href, title) async {
                                 if (href != null && href.isNotEmpty) {
@@ -514,7 +599,7 @@ class _RiyahChatBubble extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            _buildQuickLinkChips(context, message.text, isDark),
+                            _buildQuickLinkChips(context, displayText, isDark),
                           ],
                         ),
                 ],

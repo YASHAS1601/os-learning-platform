@@ -62,6 +62,76 @@ class AITutorService implements AITutorServiceInterface {
   /// Local Development Fallback Base URL
   static const String defaultBaseUrl = 'http://10.241.58.252:3000';
 
+  /// Curated Gate Smashers YouTube Resources & References
+  static const List<Map<String, String>> gateSmashersYtResources = [
+    {
+      'title': 'Gate Smashers: OS Complete Course',
+      'url': 'https://www.youtube.com/watch?v=DKb7KhfoZmU',
+      'tag': 'Full Course',
+    },
+    {
+      'title': 'Gate Smashers: CPU Scheduling Algorithms',
+      'url': 'https://www.youtube.com/results?search_query=Gate+Smashers+CPU+Scheduling+Operating+System',
+      'tag': 'CPU Scheduling',
+    },
+    {
+      'title': 'Gate Smashers: Disk Scheduling Algorithms',
+      'url': 'https://www.youtube.com/results?search_query=Gate+Smashers+Disk+Scheduling+Algorithms+Operating+System',
+      'tag': 'Disk Scheduling',
+    },
+    {
+      'title': 'Gate Smashers: File System & Inode',
+      'url': 'https://www.youtube.com/results?search_query=Gate+Smashers+File+System+Allocation+Methods+Inode',
+      'tag': 'File Systems',
+    },
+    {
+      'title': 'Gate Smashers: Process Synchronization',
+      'url': 'https://www.youtube.com/watch?v=RozoeWzT7IM',
+      'tag': 'Process & Sync',
+    },
+    {
+      'title': 'Gate Smashers: Memory Management & Paging',
+      'url': 'https://www.youtube.com/watch?v=lmlLdGMrdGU',
+      'tag': 'Memory & Paging',
+    },
+  ];
+
+  /// Guarantees that every Riyah chat message ends with the required YouTube and Web reference links
+  static String appendGateSmashersReferences(String text, {String? promptOrTopic}) {
+    if (text.contains('DKb7KhfoZmU') && text.contains('RozoeWzT7IM') && text.contains('lmlLdGMrdGU')) {
+      return text;
+    }
+
+    final lower = (promptOrTopic ?? '').toLowerCase();
+    String topicHighlight = '';
+    if (lower.contains('cpu') || lower.contains('schedul') || lower.contains('rr') || lower.contains('sjf') || lower.contains('fcfs')) {
+      topicHighlight = '- [▶ YouTube: Gate Smashers - CPU Scheduling Algorithms](https://www.youtube.com/results?search_query=Gate+Smashers+CPU+Scheduling+Operating+System)\n';
+    } else if (lower.contains('disk') || lower.contains('scan') || lower.contains('sstf') || lower.contains('c-scan')) {
+      topicHighlight = '- [▶ YouTube: Gate Smashers - Disk Scheduling Algorithms](https://www.youtube.com/results?search_query=Gate+Smashers+Disk+Scheduling+Algorithms+Operating+System)\n';
+    } else if (lower.contains('file') || lower.contains('inode') || lower.contains('directory')) {
+      topicHighlight = '- [▶ YouTube: Gate Smashers - File System Allocation Methods & Inode](https://www.youtube.com/results?search_query=Gate+Smashers+File+System+Allocation+Methods+Inode)\n';
+    } else if (lower.contains('deadlock') || lower.contains('banker') || lower.contains('sync') || lower.contains('semaphore') || lower.contains('mutex')) {
+      topicHighlight = '- [▶ YouTube: Gate Smashers - Process Synchronization & Deadlocks](https://www.youtube.com/watch?v=RozoeWzT7IM)\n';
+    } else if (lower.contains('memory') || lower.contains('pag') || lower.contains('segment') || lower.contains('tlb') || lower.contains('virtual')) {
+      topicHighlight = '- [▶ YouTube: Gate Smashers - Memory Management & Paging](https://www.youtube.com/watch?v=lmlLdGMrdGU)\n';
+    }
+
+    final referenceBlock = '''
+
+
+---
+### 📺 Gate Smashers OS Reference Links
+$topicHighlight- [▶ YouTube: Gate Smashers - OS Complete Course](https://www.youtube.com/watch?v=DKb7KhfoZmU)
+- [▶ YouTube: Gate Smashers - CPU Scheduling Algorithms](https://www.youtube.com/results?search_query=Gate+Smashers+CPU+Scheduling+Operating+System)
+- [▶ YouTube: Gate Smashers - Disk Scheduling Algorithms](https://www.youtube.com/results?search_query=Gate+Smashers+Disk+Scheduling+Algorithms+Operating+System)
+- [▶ YouTube: Gate Smashers - File System & Inode](https://www.youtube.com/results?search_query=Gate+Smashers+File+System+Allocation+Methods+Inode)
+- [▶ YouTube: Gate Smashers - Process Management & Synchronization](https://www.youtube.com/watch?v=RozoeWzT7IM)
+- [▶ YouTube: Gate Smashers - Memory Management & Paging](https://www.youtube.com/watch?v=lmlLdGMrdGU)
+- [🌐 Chrome/Web: GeeksforGeeks Operating Systems Tutorial](https://www.geeksforgeeks.org/operating-systems/)''';
+
+    return '$text$referenceBlock';
+  }
+
   final String? customBaseUrl;
   final http.Client _client;
 
@@ -175,9 +245,14 @@ class AITutorService implements AITutorServiceInterface {
             );
           }
 
+          final enrichedReplyText = appendGateSmashersReferences(
+            replyText,
+            promptOrTopic: '$prompt ${context?.topicTitle ?? ""}',
+          );
+
           return ChatMessage(
             id: DateTime.now().millisecondsSinceEpoch.toString(),
-            text: replyText,
+            text: enrichedReplyText,
             sender: MessageSender.riyah,
             timestamp: DateTime.now(),
             mode: mode,
